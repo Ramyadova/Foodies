@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Delicious Menu</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #000;
+      color: #eee; 
+      padding: 40px 20px;
+      text-align: center;
+      min-height: 100vh;
+    }
+    h1 {
+      font-size: 40px;
+      margin-bottom: 10px;
+      color: #f0a500; 
+      text-shadow: 0 0 10px #f0a500aa;
+      display: inline-block;
+      padding-bottom: 10px;
+    }
+    .description {
+      font-size: 18px;
+      margin-bottom: 30px;
+      color: #ccc;
+    }
+    select {
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #444;
+      box-shadow: 0 2px 6px rgba(255, 255, 255, 0.15);
+      cursor: pointer;
+      background-color: #111;
+      color: #eee;
+      margin-bottom: 30px;
+      transition: all 0.3s ease;
+    }
+    select:hover { border-color: #888; }
+    .menu-items {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 25px;
+    }
+    .item {
+      width: 220px;
+      padding: 15px;
+      background: #111;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(255, 255, 255, 0.15);
+    }
+    .item img {
+      width: 100%;
+      height: 140px;
+      border-radius: 10px;
+      object-fit: cover;
+      filter: brightness(0.9);
+    }
+    .item h3 {
+      margin: 10px 0 6px;
+      font-size: 18px;
+      color: #f0a500;
+    }
+    .item p {
+      font-size: 14px;
+      color: #ccc;
+    }
+    .add-cart-btn {
+      margin-top: 10px;
+      background: #f0a500;
+      color: #000;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 20px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .add-cart-btn:hover {
+      background: #c48c00;
+    }
+    .cart-alert {
+      position: fixed;
+      top: 18px;
+      right: 24px;
+      background: #222;
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 20px;
+      font-size: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s;
+      z-index: 1000;
+    }
+    .cart-alert.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #goToCartBtn {
+      display: none;
+      margin-top: 15px;
+      background: #f0a500;
+      color: #000;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 26px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #goToCartBtn:hover {
+      background: #c48c00;
+    }
+    @media (max-width: 768px) {
+      .item { width: 100%; max-width: 320px; }
+      h1 { font-size: 30px; }
+      .description { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Order Your Favorite Food</h1>
+  <p class="description">Choose from the dropdown to view Veg or Non-Veg items</p>
+
+  <select onchange="handleSelection(this.value)">
+    <option value="">-- Select Category --</option>
+    <option value="veg">Veg</option>
+    <option value="nonveg">Non-Veg</option>
+  </select>
+
+  <div class="menu-items" id="menuItems"></div>
+  <div id="cartAlert" class="cart-alert"></div>
+  <button id="goToCartBtn">Go to Cart</button>
+
+  <script>
+    const vegItems = [
+      { name: "Paneer Butter Masala", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT85iSF9VSvP3JREyzT2L40ZuxDcpcqegj5IQ&s", price: 220 },
+      { name: "Veg Biryani", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQw9LXV8RLPTcYxFQb1Njwla0d6_1RHQy8E6A&s", price: 180 },
+      { name: "Palak Paneer", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWJcLvJyDkhiyJqH0ihzhd9L4ZlmK2ucqG9Q&s", price: 200 },
+      { name: "Chole Bhature", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQO6wfiDp34c02lk78t4P5GYSy-nM3CXmGB_g&s", price: 140 },
+      { name: "Aloo Paratha", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQg51gAqwjTKB_eENwi-LJV_OKMIhsn5Zn9_A&s", price: 120 },
+      { name: "Veg Manchurian", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyClLyojdzcTHPvYsGZgpuuJbYavjUYo3OaA&s", price: 160 },
+      { name: "Matar Paneer", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdUoFnGh4M5EUMt1pEDzkD6pT_B36Yw81oOQ&s", price: 210 },
+      { name: "Mix Veg Curry", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6h-qTxmeSTQTHboCXhTs29GjopmzpfQEkaQ&s", price: 170 },
+      { name: "Rajma Chawal", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlgzQjiVHN5H8qOTpjKQ0O5PXCHR1HFvXk5g&s", price: 150 },
+      { name: "Stuffed Capsicum", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7mWFUfQxAiRiLerx3RLbgZcgfc6LuIRaCgQ&s", price: 130 }
+    ];
+
+    const nonVegItems = [
+      { name: "Chicken Biryani", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5A9Puq7OnKTSS6Yh8p9MYVbeIaLPPibHlKg&s", price: 250 },
+      { name: "Butter Chicken", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOmHzb0vLeLbuc7NiP3w5y2J30-NkBRPHrKw&s", price: 270 },
+      { name: "Fish Curry", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGE5zwPan8i0KYA57ChSwW7j7j-e8dRvd6wA&s", price: 230 },
+      { name: "Egg Curry", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7pM-okWjcgsKqSGEFe56KFXfOnlVKuvq4_g&s", price: 160 },
+      { name: "Mutton Rogan Josh", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkCF1YvyWMYSA6CMm6QugxR-F30DcY_RZUFQ&s", price: 320 },
+      { name: "Chicken 65", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMmnjHVZiILSMaC7GnRu9BDmatFZ8qSWDERw&s", price: 180 },
+      { name: "Grilled Chicken", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2NQcbr0sk3SRNrokMr-5-LerDdY1oZMcQFw&s", price: 220 },
+      { name: "Prawns Masala", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAoPsQH7CY-X3MqHTj3-gzZGdwRn9XmvV75Q&s", price: 290 },
+      { name: "Keema Pav", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0IfrJ6gspjX_I2IV4qJebZol13rMoefblmA&s", price: 170 },
+      { name: "Chicken Tikka", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9zrOl6K0bAFzVWc1JeF9aKAZK2eRijRS-JA&s", price: 210 }
+    ];
+
+    function handleSelection(value) {
+      document.getElementById("goToCartBtn").style.display = "none"; 
+      if (value === "veg") {
+        displayItems(vegItems, "veg");
+      } else if (value === "nonveg") {
+        displayItems(nonVegItems, "nonveg");
+      } else {
+        document.getElementById("menuItems").innerHTML = "";
+      }
+    }
+
+    function displayItems(items, type) {
+      const container = document.getElementById("menuItems");
+      container.innerHTML = "";
+      items.forEach((item, idx) => {
+        container.innerHTML += `
+          <div class="item">
+            <img src="${item.img}" alt="${item.name}">
+            <h3>${item.name}</h3>
+            <p>₹${item.price} &nbsp; | &nbsp; Delicious and freshly made for you!</p>
+            <button class="add-cart-btn" onclick="addToCart('${type}', ${idx})">Add to Cart</button>
+          </div>
+        `;
+      });
+    }
+    const goToCartBtn = document.getElementById("goToCartBtn");
+    goToCartBtn.onclick = function() {
+      window.location.href = "cart.html";
+    };
+    function addToCart(type, idx) {
+      const item = type === "veg" ? vegItems[idx] : nonVegItems[idx];
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const existing = cart.find(i => i.name === item.name);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ ...item, qty: 1 });
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      showCartAlert(item.name + " added to cart!");
+      goToCartBtn.style.display = "inline-block"; 
+    }
+    function showCartAlert(msg) {
+      const alertDiv = document.getElementById("cartAlert");
+      alertDiv.textContent = msg;
+      alertDiv.classList.add("show");
+      setTimeout(() => alertDiv.classList.remove("show"), 1200);
+    }
+  </script>
+
+</body>
+</html>

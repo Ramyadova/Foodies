@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Swiggy Clone - Cart</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-image: url('https://t4.ftcdn.net/jpg/04/17/20/69/360_F_417206990_H8dkSRvxG9e6ykpNTeo1ti7Nui33I5bQ.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 20px 40px;
+    }
+    
+    .navbar {
+      background-color: rgba(17, 17, 17, 0.85);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 10;
+      backdrop-filter: blur(5px);
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: bold;
+      color: #ff6600;
+    }
+
+    .navbar ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: 20px;
+    }
+
+    .navbar ul li a {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 8px 12px;
+      transition: background 0.3s ease;
+    }
+
+    .navbar ul li a:hover {
+      background-color: #ff6600;
+      border-radius: 4px;
+    }
+
+    .cart-container {
+      max-width: 1000px;
+      margin: 100px auto 0;
+      padding: 20px;
+      background-color: rgba(42, 42, 42, 0.85);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.7);
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 300px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cart-title {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #ff6600;
+      text-align: center;
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #444;
+      padding-bottom: 10px;
+    }
+
+    .cart-item img {
+      width: 100px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-right: 20px;
+    }
+
+    .cart-item-details {
+      flex: 1;
+    }
+
+    .cart-item-details h4 {
+      margin: 0;
+      font-size: 20px;
+      color: #fff;
+    }
+
+    .cart-item-details p {
+      margin: 5px 0;
+      font-size: 16px;
+      color: #ccc;
+    }
+
+    .remove-btn {
+      background-color: #ff4444;
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .remove-btn:hover {
+      background-color: #cc0000;
+    }
+
+    .total {
+      text-align: right;
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 20px;
+      color: #ffcc00;
+    }
+
+    #placeOrderBtn {
+      margin-top: 24px;
+      background: #ff6600;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 30px;
+      font-size: 17px;
+      cursor: pointer;
+      transition: background 0.2s;
+      align-self: flex-end;
+    }
+
+    #placeOrderBtn:hover {
+      background: #cc5200;
+    }
+
+    #orderConfirmationSection {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 20px;
+      text-align: center;
+      color: #4BB543;
+      font-weight: 700;
+      font-size: 28px;
+      gap: 25px;
+      min-height: 300px;
+      width: 100%;
+      max-width: 600px;
+      
+      margin: 100px auto 0;
+    }
+
+    .success-icon {
+      width: 100px;
+      height: 100px;
+      background: #4BB543;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 30px rgba(75, 181, 67, 0.6);
+      animation: bounce 1s ease;
+    }
+
+    .checkmark {
+      font-size: 50px;
+      color: white;
+      font-weight: bold;
+    }
+
+    @keyframes bounce {
+      0%   { transform: scale(0.2); opacity: 0; }
+      50%  { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    .back-btn {
+      background-color: #ff6600;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 18px;
+      transition: background-color 0.3s;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .back-btn:hover {
+      background-color: #cc5200;
+    }
+
+    @media (max-width: 600px) {
+      .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .cart-item img {
+        margin-bottom: 10px;
+      }
+      .total {
+        text-align: left;
+      }
+      #orderConfirmationSection {
+        margin: 80px 10px 0;
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cart Section -->
+  <div class="cart-container" id="cartContainer">
+    <div class="cart-title">Your Cart</div>
+    <div id="cartItems"></div>
+    <div class="total" id="cartTotal">Total: ₹0</div>
+    <button id="placeOrderBtn">Place Order</button>
+  </div>
+
+  <!-- Order Confirmation Section -->
+  <div id="orderConfirmationSection">
+    <div class="success-icon">
+      <div class="checkmark">&#10004;</div>
+    </div>
+    <div>Thank you! Your order has been placed successfully.</div>
+    <a href="order.html" class="back-btn">Order More</a>
+  </div>
+
+  <script>
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const cartContainer = document.getElementById("cartContainer");
+    const cartItemsDiv = document.getElementById("cartItems");
+    const totalDisplay = document.getElementById("cartTotal");
+    const placeOrderBtn = document.getElementById("placeOrderBtn");
+    const orderConfirmationSection = document.getElementById("orderConfirmationSection");
+
+    function displayCart() {
+      if (cart.length === 0) {
+        cartContainer.style.display = "none";
+        orderConfirmationSection.style.display = "flex";
+        return;
+      }
+
+      cartContainer.style.display = "flex";
+      orderConfirmationSection.style.display = "none";
+
+      cartItemsDiv.innerHTML = "";
+      let total = 0;
+
+      cart.forEach((item, index) => {
+        const qty = item.qty || 1;
+        const itemTotal = item.price * qty;
+        total += itemTotal;
+
+        const itemHTML = `
+          <div class="cart-item">
+            <img src="${item.img}" alt="${item.name}">
+            <div class="cart-item-details">
+              <h4>${item.name}</h4>
+              <p>Price: ₹${item.price} &nbsp; | &nbsp; Qty: ${qty}</p>
+              <p>Subtotal: ₹${itemTotal}</p>
+            </div>
+            <button class="remove-btn" onclick="removeFromCart(${index})">Remove</button>
+          </div>
+        `;
+        cartItemsDiv.innerHTML += itemHTML;
+      });
+
+      totalDisplay.textContent = `Total: ₹${total}`;
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      displayCart();
+    }
+
+    placeOrderBtn.addEventListener("click", function () {
+      if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+      localStorage.removeItem("cart");
+      cart = [];
+      displayCart();
+    });
+
+    displayCart();
+  </script>
+</body>
+</html>
